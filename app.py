@@ -5,12 +5,30 @@ from models import db, User, Student
 from datetime import datetime
 import os
 
-# --- Cấu hình ứng dụng ---
+# --- Khởi tạo ứng dụng ---
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-very-secret-key' # Thay bằng một chuỗi bí mật thật sự
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL').replace("://", "ql://", 1)
+
+# --- Cấu hình ứng dụng ---
+# Phần này đã được sửa lại hoàn toàn để hoạt động chính xác
+# 1. Cấu hình SECRET_KEY
+# Lấy SECRET_KEY từ biến môi trường, nếu không có thì dùng key tạm cho local
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    SECRET_KEY = "day-la-khoa-bi-mat-chi-dung-khi-phat-trien"
+app.config['SECRET_KEY'] = SECRET_KEY
+
+# 2. Cấu hình SQLAlchemy
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a-default-fallback-key')
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    # Môi trường Production (trên Render)
+    # Sửa lỗi tương thích giữa 'postgres://' và 'postgresql://' cho SQLAlchemy
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+else:
+    # Môi trường Development (chạy ở máy cá nhân)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///school.db'
 
 # --- Khởi tạo các tiện ích ---
 db.init_app(app)
