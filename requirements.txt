@@ -1,0 +1,7 @@
+Flask
+Flask-SQLAlchemy
+Flask-Login
+Werkzeug
+Flask-Bcrypt
+gunicorn  # <-- Thêm dòng này
+psycopg2-binary # <-- Thêm dòng này (cho database)
